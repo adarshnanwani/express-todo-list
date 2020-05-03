@@ -13,6 +13,7 @@ dotenv.config({
 connectDB();
 
 // Route files
+const auth = require('./routes/v1/auth');
 const todos = require('./routes/v1/todos');
 
 const app = express();
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use(cors());
 
 // Mount routers
+app.use('/api/v1/auth', auth);
 app.use('/api/v1/todos', todos);
 
 app.use(errorHandler);
