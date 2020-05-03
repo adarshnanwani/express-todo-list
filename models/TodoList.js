@@ -11,10 +11,6 @@ const TodoListSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    items: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Todo',
-    },
   },
   {
     timestamps: true,
