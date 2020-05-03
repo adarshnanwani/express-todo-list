@@ -24,9 +24,8 @@ exports.addTodo = asyncHandler(async (req, res, next) => {
 exports.getTodo = asyncHandler(async (req, res, next) => {
   const todo = await Todo.findById(req.params.id);
   if (!todo) {
-    return ErrorResponse(
-      `No todo item found with the id ${req.params.id}`,
-      404
+    return next(
+      new ErrorResponse(`No todo item found with the id ${req.params.id}`, 404)
     );
   }
   res.status(200).json({ success: true, data: todo });
@@ -38,9 +37,8 @@ exports.getTodo = asyncHandler(async (req, res, next) => {
 exports.updateTodo = asyncHandler(async (req, res, next) => {
   let todo = await Todo.findById(req.params.id);
   if (!todo) {
-    return ErrorResponse(
-      `No todo item found with the id ${req.params.id}`,
-      404
+    return next(
+      new ErrorResponse(`No todo item found with the id ${req.params.id}`, 404)
     );
   }
 
@@ -58,9 +56,8 @@ exports.updateTodo = asyncHandler(async (req, res, next) => {
 exports.deleteTodo = asyncHandler(async (req, res, next) => {
   const todo = await Todo.findById(req.params.id);
   if (!todo) {
-    return ErrorResponse(
-      `No todo item found with the id ${req.params.id}`,
-      404
+    return next(
+      new ErrorResponse(`No todo item found with the id ${req.params.id}`, 404)
     );
   }
 
