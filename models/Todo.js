@@ -10,6 +10,10 @@ const TodoSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    todolist: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
   },
   {
     timestamps: true,
