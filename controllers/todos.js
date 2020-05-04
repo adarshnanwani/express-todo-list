@@ -1,4 +1,5 @@
 const Todo = require('../models/Todo');
+const TodoList = require('../models/TodoList');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
@@ -14,14 +15,22 @@ exports.getAllTodos = asyncHandler(async (req, res, next) => {
 //@route POST /api/v1/todos/:todolistId
 //@access private
 exports.addTodo = asyncHandler(async (req, res, next) => {
-  let name;
-  if (!req.params.todolistId) {
-    name = 'default';
+  const { todolistId } = req.params;
+  let listId;
+  if (!todolistId) {
+    req.body.todolist = req.user.defaultList;
   } else {
-    name = req.params.name;
+    const todoListData = await TodoList.findById(todolistId);
+    if (!todoListData) {
+      return next(
+        new ErrorResponse(`No todo list find wit the id ${todolistId}`, 400)
+      );
+    }
+    if (todoListData.user.toString() !== req.user.id) {
+      return next(new ErrorResponse(`Unauthorized access`, 401));
+    }
+    req.body.todolist = todoListData.id;
   }
-
-  req.body.todolist;
 
   const todo = await Todo.create(req.body);
 
