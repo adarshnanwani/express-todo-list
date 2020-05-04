@@ -1,6 +1,6 @@
 const Todo = require('../models/Todo');
 const ErrorResponse = require('../utils/errorResponse');
-const asyncHandler = require('../middleware/asnyc');
+const asyncHandler = require('../middleware/async');
 
 //@desc Get all todos
 //@route GET /api/v1/todos
@@ -11,10 +11,20 @@ exports.getAllTodos = asyncHandler(async (req, res, next) => {
 });
 
 //@desc Add a new todo
-//@route POST /api/v1/todos
-//@access public
+//@route POST /api/v1/todos/:todolistId
+//@access private
 exports.addTodo = asyncHandler(async (req, res, next) => {
+  let name;
+  if (!req.params.todolistId) {
+    name = 'default';
+  } else {
+    name = req.params.name;
+  }
+
+  req.body.todolist;
+
   const todo = await Todo.create(req.body);
+
   res.status(201).json({ success: true, data: todo });
 });
 

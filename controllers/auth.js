@@ -8,17 +8,14 @@ const crypto = require('crypto');
 //@route    POST api/v1/auth/register
 //@access   Public
 exports.register = asyncHandler(async (req, res, next) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password } = req.body;
 
   const user = await User.create({
     name,
     email,
     password,
-    role,
   });
 
-  // create token
-  const token = user.getSignedJwtToken();
   sendTokenResponse(user, 200, res);
 });
 
@@ -145,7 +142,7 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 });
 
 // @desc      Update user details
-// @route     PUT /api/v1/users
+// @route     PUT /api/v1/auth/update
 // @access    Private
 exports.updateDetails = asyncHandler(async (req, res, next) => {
   const fieldsToUpdate = {

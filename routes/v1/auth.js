@@ -9,9 +9,9 @@ const {
   updatePassword,
   updateDetails,
   logout,
-} = require('../controllers/auth');
+} = require('../../controllers/auth');
 
-const { protect } = require('../middleware/auth');
+const { protect } = require('../../middleware/auth');
 
 router.route('/register').post(register);
 router.route('/login').post(login);

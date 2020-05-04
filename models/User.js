@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const TodoList = require('./TodoList');
 
 const UserSchema = new mongoose.Schema(
   {
@@ -24,6 +25,9 @@ const UserSchema = new mongoose.Schema(
       minlength: 6,
       select: false,
     },
+    defaultList: {
+      type: mongoose.Schema.Types.ObjectId,
+    },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },
@@ -42,6 +46,15 @@ UserSchema.pre('save', async function (next) {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
+});
+
+UserSchema.post('save', async function (doc, next) {
+  if (!doc.defaultList) {
+    const list = await TodoList.create({ name: 'default', user: doc.id });
+    doc.defaultList = list.id;
+    doc.save();
+    next();
+  }
 });
 
 // Sign JWT and return
