@@ -99,8 +99,6 @@ exports.updateTodo = asyncHandler(async (req, res, next) => {
         : todo.completed,
   };
 
-  console.log(req.body);
-
   todo = await Todo.findByIdAndUpdate(req.params.id, fieldsToUpdate, {
     new: true,
     runValidators: true,

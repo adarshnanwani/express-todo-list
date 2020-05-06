@@ -11,6 +11,7 @@ const {
 } = require('../../controllers/todos');
 const { protect } = require('../../middleware/auth');
 
+router.route('/').post(protect, addTodo);
 router.route('/all').get(protect, getAllTodos);
 router.route('/default').get(protect, getAllDefaultTodos);
 router
