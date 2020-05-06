@@ -74,7 +74,7 @@ exports.renameTodoList = asyncHandler(async (req, res, next) => {
 exports.getAllTodoLists = asyncHandler(async (req, res, next) => {
   const lists = await TodoList.find({
     user: req.user.id,
-  });
+  }).populate('todosCount');
 
   res.status(200).json({ success: true, data: lists });
 });
