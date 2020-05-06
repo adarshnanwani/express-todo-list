@@ -3,11 +3,35 @@ const TodoList = require('../models/TodoList');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
-//@desc Get all todos
-//@route GET /api/v1/todos
+//@desc Get all todos for a user
+//@route GET /api/v1/todos/all
 //@access public
 exports.getAllTodos = asyncHandler(async (req, res, next) => {
-  const todos = await Todo.find();
+  const todos = await Todo.find({
+    user: req.user.id,
+  });
+  res.status(200).json({ success: true, data: todos });
+});
+
+//@desc Get default todo list todos for a user
+//@route GET /api/v1/todos/default
+//@access public
+exports.getAllDefaultTodos = asyncHandler(async (req, res, next) => {
+  const todos = await Todo.find({
+    user: req.user.id,
+    todolist: req.user.defaultList,
+  });
+  res.status(200).json({ success: true, data: todos });
+});
+
+//@desc Get all todos from a todo list for a user
+//@route GET /api/v1/todos
+//@access public
+exports.getAllTodosFromATodoList = asyncHandler(async (req, res, next) => {
+  const todos = await Todo.find({
+    user: req.user.id,
+    todolist: req.params.todolistId,
+  });
   res.status(200).json({ success: true, data: todos });
 });
 
@@ -16,14 +40,13 @@ exports.getAllTodos = asyncHandler(async (req, res, next) => {
 //@access private
 exports.addTodo = asyncHandler(async (req, res, next) => {
   const { todolistId } = req.params;
-  let listId;
   if (!todolistId) {
     req.body.todolist = req.user.defaultList;
   } else {
     const todoListData = await TodoList.findById(todolistId);
     if (!todoListData) {
       return next(
-        new ErrorResponse(`No todo list find wit the id ${todolistId}`, 400)
+        new ErrorResponse(`No todo list find with the id ${todolistId}`, 400)
       );
     }
     if (todoListData.user.toString() !== req.user.id) {
@@ -31,6 +54,8 @@ exports.addTodo = asyncHandler(async (req, res, next) => {
     }
     req.body.todolist = todoListData.id;
   }
+
+  req.body.user = req.user.id;
 
   const todo = await Todo.create(req.body);
 
@@ -55,12 +80,15 @@ exports.getTodo = asyncHandler(async (req, res, next) => {
 //@access public
 exports.updateTodo = asyncHandler(async (req, res, next) => {
   let todo = await Todo.findById(req.params.id);
+
   if (!todo) {
     return next(
       new ErrorResponse(`No todo item found with the id ${req.params.id}`, 404)
     );
   }
-
+  if (todo.user.toString !== req.user.id) {
+    return next(new ErrorResponse(`Unauthorized access`, 401));
+  }
   todo = await Todo.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -78,6 +106,10 @@ exports.deleteTodo = asyncHandler(async (req, res, next) => {
     return next(
       new ErrorResponse(`No todo item found with the id ${req.params.id}`, 404)
     );
+  }
+
+  if (todo.user.toString !== req.user.id) {
+    return next(new ErrorResponse(`Unauthorized access`, 401));
   }
 
   await todo.remove();
