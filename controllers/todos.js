@@ -86,10 +86,22 @@ exports.updateTodo = asyncHandler(async (req, res, next) => {
       new ErrorResponse(`No todo item found with the id ${req.params.id}`, 404)
     );
   }
-  if (todo.user.toString !== req.user.id) {
+
+  if (todo.user.toString() !== req.user.id) {
     return next(new ErrorResponse(`Unauthorized access`, 401));
   }
-  todo = await Todo.findByIdAndUpdate(req.params.id, req.body, {
+
+  const fieldsToUpdate = {
+    text: typeof req.body.text !== 'undefined' ? req.body.text : todo.text,
+    completed:
+      typeof req.body.completed !== 'undefined'
+        ? req.body.completed
+        : todo.completed,
+  };
+
+  console.log(req.body);
+
+  todo = await Todo.findByIdAndUpdate(req.params.id, fieldsToUpdate, {
     new: true,
     runValidators: true,
   });
@@ -108,7 +120,7 @@ exports.deleteTodo = asyncHandler(async (req, res, next) => {
     );
   }
 
-  if (todo.user.toString !== req.user.id) {
+  if (todo.user.toString() !== req.user.id) {
     return next(new ErrorResponse(`Unauthorized access`, 401));
   }
 
