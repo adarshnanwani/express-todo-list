@@ -1,6 +1,6 @@
 const TodoList = require('../models/TodoList');
 const asyncHandler = require('../middleware/async');
-const ErrorResponse = require('../middleware/error');
+const ErrorResponse = require('../utils/errorResponse');
 
 //@desc     Add new TodoList
 //@route    POST /api/v1/todolist/:name
@@ -55,7 +55,7 @@ exports.renameTodoList = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Unauthorized access.`, 401));
   }
 
-  list = await list.findByIdAndUpdate(
+  list = await TodoList.findByIdAndUpdate(
     id,
     {
       name,
@@ -66,4 +66,15 @@ exports.renameTodoList = asyncHandler(async (req, res, next) => {
     }
   );
   res.status(200).json({ success: true, data: list });
+});
+
+//@desc     Get all TodoLists for a user
+//@route    GET /api/v1/todolist
+//@access   Private
+exports.getAllTodoLists = asyncHandler(async (req, res, next) => {
+  const lists = await TodoList.find({
+    user: req.user.id,
+  });
+
+  res.status(200).json({ success: true, data: lists });
 });
