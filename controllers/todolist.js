@@ -34,6 +34,10 @@ exports.deleteTodoList = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Unauthorized access.`, 401));
   }
 
+  if (req.user.defaultList.toString() === id) {
+    return next(new ErrorResponse(`Cannot delete the default todo list.`, 200));
+  }
+
   await list.remove();
   res.status(200).json({ success: true, data: {} });
 });
