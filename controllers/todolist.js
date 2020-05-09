@@ -1,4 +1,5 @@
 const TodoList = require('../models/TodoList');
+const Todo = require('../models/Todo');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -38,6 +39,12 @@ exports.deleteTodoList = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Cannot delete the default todo list.`, 200));
   }
 
+  // Delete items belonging to this todo list
+  await Todo.deleteMany({
+    todolist: id,
+  });
+
+  // Remove the todolist itself
   await list.remove();
   res.status(200).json({ success: true, data: {} });
 });
